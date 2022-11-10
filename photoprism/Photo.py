@@ -42,14 +42,12 @@ class Photo():
         """Small function to check if an album exists"""
 
         data = self.list_albums()
-        exists = False
         for d in data:
             if name == d["Title"]:
-                exists = True
+                return True
 
-        if exists == False:
-            if create_if_not:
-                self.create_album(name)
+        if create_if_not:
+            self.create_album(name)
 
         return exists
 
