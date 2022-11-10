@@ -85,7 +85,7 @@ class Photo():
         
         if r.status_code == 200:
             return True
-            
+
         return False
 
     def add_to_album_from_query(self, query, albumname):
@@ -102,10 +102,11 @@ class Photo():
 
         url = f"{self.session.url}/albums/{uid}"
         r = requests.get(url, headers=self.header)
-        result = False
+        
         if r.status_code == 200:
-            result = json.loads(r.text)
-        return result
+            return json.loads(r.text)
+        
+        return False
 
     def start_import(self, path="upload", move=False):
         """Start an import job, default path is upload. It returns True when the import started, not when finished"""
@@ -116,19 +117,21 @@ class Photo():
             "move": move
         }
         r = requests.post(url, data=json.dumps(data), headers=self.header)
-        result = False
+        
         if r.status_code == 200:
-            result = True
-        return result
+            return True
+        
+        return False
 
     def stop_import(self):
         """Stop an import job"""
         url = f"{self.session.url}/import"
         r = requests.delete(url, headers=self.header)
-        result = False
+        
         if r.status_code == 200:
-            result = True
-        return result
+            return True
+        
+        return False
 
     def raw_call(self, endpoint, type="GET", data=False):
         """Function to perform a request to the photoprism server"""
