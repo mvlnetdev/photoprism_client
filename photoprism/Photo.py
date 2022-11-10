@@ -127,29 +127,21 @@ class Photo():
         """Stop an import job"""
         url = f"{self.session.url}/import"
         r = requests.delete(url, headers=self.header)
-        
+
         if r.status_code == 200:
             return True
         
         return False
 
-    def raw_call(self, endpoint, type="GET", data=False):
+    def raw_call(self, endpoint, type="GET", data=None):
         """Function to perform a request to the photoprism server"""
 
         url = f"{self.session.url}/{endpoint}"
         if type == "GET":
-            if data:
-                r = requests.get(url, data = json.dumps(data), headers=self.header)
-            else:
-                r = requests.get(url, headers=self.header)
+            return requests.get(url, headers=self.header)
         elif type == "POST":
-            if data:
-                r = requests.post(url, data = json.dumps(data), headers=self.header)
-            else:
-                r = requests.post(url, headers=self.header)
+            return requests.post(url, data=json.dumps(data) if data else None, headers=self.header)
         elif type == "DELETE":
-            r = requests.delete(url, headers=self.header)
-        else:
-            r = False
-
-        return r
+            return requests.delete(url, headers=self.header)
+        
+        return False
