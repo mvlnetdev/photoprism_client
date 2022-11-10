@@ -68,10 +68,11 @@ class Photo():
         url = f"{self.session.url}/albums"
         data = {"Title":title,"Favorite":False}
         r = requests.post(url=url, data=json.dumps(data), headers=self.header)
-        result = False
+        
         if r.status_code == 200:
-            result = True
-        return result
+            return True
+        
+        return False
 
     def add_photos_to_album(self, photos, album_uid):
         """Add photos to an album, you will need to provide a list of UIDs of the photos you want to add. Returns True if successfull"""
@@ -81,10 +82,11 @@ class Photo():
             "photos":photos
         }
         r = requests.post(url, data=json.dumps(data), headers=self.header)
-        result = False
+        
         if r.status_code == 200:
-            result = True
-        return result
+            return True
+            
+        return False
 
     def add_to_album_from_query(self, query, albumname):
         """Provide a search query and add all photos that are returned into an album. Provide the albumname, not the UID of the album."""
