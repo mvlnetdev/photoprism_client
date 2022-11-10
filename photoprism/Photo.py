@@ -7,7 +7,7 @@ class Photo():
     def __init__(self, session):
         """Initialize based upon a session"""
         if type(session) != Session.Session:
-            TypeError(f"session variable is not of type photoprism.Session.Session, but {type(session)}")
+            raise TypeError(f"session variable is not of type photoprism.Session.Session, but {type(session)}")
 
         self.session = session
         self.header = {
