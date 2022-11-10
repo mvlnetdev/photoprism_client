@@ -58,11 +58,9 @@ class Photo():
         uid = None
         for d in data:
             if name == d["Title"]:
-                uid = d["UID"]
-        if uid == None:
-            return False
-        else:
-            return uid
+                return d["UID"]
+        
+        return False
 
     def create_album(self, title):
         """Create an album, returns a boolean if it worked"""
