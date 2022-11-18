@@ -99,7 +99,7 @@ class Photo():
         album_uid = self.get_album_uid_by_name(albumname)
         photolist = self.get_uid_list_of_search(query, count=1000000)
         result = self.add_photos_to_album(photolist, album_uid)
-        print(result)
+        return result
 
     def get_album(self, uid):
         """Get all information of an album based upon the UID of the album"""
