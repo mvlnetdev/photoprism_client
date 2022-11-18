@@ -51,6 +51,7 @@ class Photo():
         if exists == False:
             if create_if_not:
                 self.create_album(name)
+                exists = True
 
         return exists
 
@@ -110,6 +111,33 @@ class Photo():
             result = json.loads(r.text)
         return result
 
+    def remove_photos_from_album(self,albumname, photos=False, count=1000000):
+        """Remove photos from an album, Returns True if successfull"""
+        album_uid = self.get_album_uid_by_name(albumname)
+        if photos == False:
+            query = f"album:\"{albumname}\""
+            photos = self.get_uid_list_of_search(query,count=count)
+
+        url = f"{self.session.url}/albums/{album_uid}/photos"
+        data = {
+            "photos":photos
+        }
+        r = requests.delete(url, data=json.dumps(data), headers=self.header)
+        result = False
+        if r.status_code == 200:
+            result = True
+        return result
+
+    def remove_album(self, albumname):
+        """Remove album based on album name"""
+        album_uid = self.get_album_uid_by_name(albumname)
+        url = f"{self.session.url}/albums/{album_uid}"
+        r = requests.delete(url, headers=self.header)
+        result = False
+        if r.status_code == 200:
+            result = json.loads(r.text)
+        return result
+
     def start_import(self, path="upload", move=False):
         """Start an import job, default path is upload. It returns True when the import started, not when finished"""
 
@@ -148,7 +176,10 @@ class Photo():
             else:
                 r = requests.post(url, headers=self.header)
         elif type == "DELETE":
-            r = requests.delete(url, headers=self.header)
+            if data:
+                r = requests.delete(url, data = json.dumps(data), headers=self.header)
+            else:
+                r = requests.delete(url, headers=self.header)
         else:
             r = False
 
