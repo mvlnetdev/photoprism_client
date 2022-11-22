@@ -49,7 +49,7 @@ class Photo():
         if create_if_not:
             self.create_album(name)
 
-        return exists
+        return False
 
     def get_album_uid_by_name(self, name):
         """Get the UID of an album using the name of the album. Be aware, it uses the list_albums function that is limited to 100000 albums"""
