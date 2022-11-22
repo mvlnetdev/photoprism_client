@@ -14,7 +14,7 @@ To start interacting with Photoprism set up a session. You always need to do thi
 ``` python
 from photoprism.Session import Session
 pp_session = Session("admin", "changethis", "demo.photoprism.app")
-pp.session.create()
+pp_session.create()
 ```
 
 ## Searching
