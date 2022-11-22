@@ -6,11 +6,10 @@ import requests, json
 class Photo():
     def __init__(self, session):
         """Initialize based upon a session"""
-        if type(session) == Session.Session:
-            self.session = session
-        else:
-            TypeError(f"session variable is not of type photoprism.Session.Session, but {type(session)}")
+        if type(session) != Session.Session:
+            raise TypeError(f"session variable is not of type photoprism.Session.Session, but {type(session)}")
 
+        self.session = session
         self.header = {
             "X-Session-ID": self.session.session_id}
 
@@ -43,15 +42,12 @@ class Photo():
         """Small function to check if an album exists"""
 
         data = self.list_albums()
-        exists = False
         for d in data:
             if name == d["Title"]:
-                exists = True
+                return True
 
-        if exists == False:
-            if create_if_not:
-                self.create_album(name)
-                exists = True
+        if create_if_not:
+            self.create_album(name)
 
         return exists
 
@@ -62,11 +58,9 @@ class Photo():
         uid = None
         for d in data:
             if name == d["Title"]:
-                uid = d["UID"]
-        if uid == None:
-            return False
-        else:
-            return uid
+                return d["UID"]
+        
+        return False
 
     def create_album(self, title):
         """Create an album, returns a boolean if it worked"""
@@ -74,10 +68,11 @@ class Photo():
         url = f"{self.session.url}/albums"
         data = {"Title":title,"Favorite":False}
         r = requests.post(url=url, data=json.dumps(data), headers=self.header)
-        result = False
+        
         if r.status_code == 200:
-            result = True
-        return result
+            return True
+        
+        return False
 
     def add_photos_to_album(self, photos, album_uid):
         """Add photos to an album, you will need to provide a list of UIDs of the photos you want to add. Returns True if successfull"""
@@ -87,10 +82,11 @@ class Photo():
             "photos":photos
         }
         r = requests.post(url, data=json.dumps(data), headers=self.header)
-        result = False
+        
         if r.status_code == 200:
-            result = True
-        return result
+            return True
+
+        return False
 
     def add_to_album_from_query(self, query, albumname):
         """Provide a search query and add all photos that are returned into an album. Provide the albumname, not the UID of the album."""
@@ -106,10 +102,11 @@ class Photo():
 
         url = f"{self.session.url}/albums/{uid}"
         r = requests.get(url, headers=self.header)
-        result = False
+        
         if r.status_code == 200:
-            result = json.loads(r.text)
-        return result
+            return json.loads(r.text)
+        
+        return False
 
     def remove_photos_from_album(self,albumname, photos=False, count=1000000):
         """Remove photos from an album, Returns True if successfull"""
@@ -147,40 +144,31 @@ class Photo():
             "move": move
         }
         r = requests.post(url, data=json.dumps(data), headers=self.header)
-        result = False
+        
         if r.status_code == 200:
-            result = True
-        return result
+            return True
+        
+        return False
 
     def stop_import(self):
         """Stop an import job"""
         url = f"{self.session.url}/import"
         r = requests.delete(url, headers=self.header)
-        result = False
-        if r.status_code == 200:
-            result = True
-        return result
 
-    def raw_call(self, endpoint, type="GET", data=False):
+        if r.status_code == 200:
+            return True
+        
+        return False
+
+    def raw_call(self, endpoint, type="GET", data=None):
         """Function to perform a request to the photoprism server"""
 
         url = f"{self.session.url}/{endpoint}"
         if type == "GET":
-            if data:
-                r = requests.get(url, data = json.dumps(data), headers=self.header)
-            else:
-                r = requests.get(url, headers=self.header)
+            return requests.get(url, headers=self.header)
         elif type == "POST":
-            if data:
-                r = requests.post(url, data = json.dumps(data), headers=self.header)
-            else:
-                r = requests.post(url, headers=self.header)
+            return requests.post(url, data=json.dumps(data) if data else None, headers=self.header)
         elif type == "DELETE":
-            if data:
-                r = requests.delete(url, data = json.dumps(data), headers=self.header)
-            else:
-                r = requests.delete(url, headers=self.header)
-        else:
-            r = False
-
-        return r
+            return requests.delete(url, headers=self.header)
+        
+        return False
