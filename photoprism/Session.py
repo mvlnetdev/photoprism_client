@@ -3,6 +3,7 @@
 import json
 from requests import Session as r_session, Request as r_request
 
+from photoprism import mimetypes
 
 class Session():
     def __init__(self, username, password, host, use_https=False, verify_cert=True, user_agent=None):
@@ -47,13 +48,29 @@ class Session():
         p = r.prepare()
         resp = s.send(p)
 
-        data = resp.text
         headers = resp.headers
 
-        if headers["Content-Type"].split("; ")[0] == "application/json":
-            data_out = json.loads(data)
+        content_type = headers["Content-Type"].split("; ")
+        if content_type[0] == "application/json":
+            data_out = json.loads(resp.text)
+        elif content_type[0].split("/")[0] == "image":
+            extension = mimetypes.image[content_type[0].split("/")[1]]
+            if "filename" in kwargs:
+                filename = f"{kwargs['filename']}{extension}"
+            else:
+                header_filename = headers["Content-Disposition"].split("; ")[1]
+                filename = header_filename.split("=")[1][1:-1]
+
+            if "path" in kwargs:
+                filename = f"{kwargs['path']}/{filename}"
+
+            with open(filename, "wb") as f:
+                resp.raw.decode_content = True
+                f.write(resp.content)
+            data_out = True
+
         else:
-            data_out = data
+            data_out = resp.text
 
         return resp.status_code, data_out
 
