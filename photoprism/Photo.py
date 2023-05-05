@@ -14,10 +14,10 @@ class Photo():
             "X-Session-ID": self.session.session_id}
 
 
-    def search(self, query, count=100, offset=0):
+    def search(self, query, count=100, offset=0, order='newest'):
         """Basic search function. Returns a Dict object based upon the returned JSON"""
 
-        url = f"{self.session.url}/photos?count={count}&q={query}&offset={offset}"
+        url = f"{self.session.url}/photos?count={count}&q={query}&offset={offset}&order={order}"
         r = requests.get(url, headers=self.header)
         return json.loads(r.text)
 
