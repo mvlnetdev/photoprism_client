@@ -17,6 +17,29 @@ pp_session = Session("admin", "changethis", "demo.photoprism.app")
 pp_session.create()
 ```
 
+### HTTPS
+It is possible to connect to Photoprism using HTTPS. Two variables exist for this:
+- use_https: Boolean
+- verify_cert: Boolean
+
+By default, a connection will be made using HTTP. A session can be set up using HTTPS by setting the use_https variable to _True_. By default the certificate will be verified. This check can be disabled by setting the verify_cert variable to _False_. Only change this if you understand what this means. It is better to leave this variable unchanged. 
+
+An example is:
+```python
+from photoprism.Session import Session
+pp_session = Session("admin", "changethis", "demo.photoprism.app", use_https=True, verify_cert=False)
+pp_session.create()
+```
+
+### User agent
+The user agent is _Photoprism Python Client_ by default. You can change this using the variable _user_agent_. 
+For example:
+```python
+from photoprism.Session import Session
+pp_session = Session("admin", "changethis", "demo.photoprism.app", user_agent="Hello World! This is an example.")
+pp_session.create()
+```
+
 ## Searching
 To search for photos. With this example it will return the first 100 results. You can change this with `count=1000`.
 
@@ -32,9 +55,9 @@ This is a list of all other functions within the client. If you want other funct
 | function | description | variables | returns |
 | ---- | ----- | ------ | ----- |
 | Photo.add_photos_to_album() | Add photos to an album, you will need to provide a list of UIDs of the photos you want to add. Returns True if successfull | photos: list, album_uid: string | True if successfull  |
-| Photo.add_to_album_from_query() | Provide a search query and add all photos that are returned into an album. Provide the albumname, not the UID of the album. | query: string, albumname: string | True if successfull |
+| Photo.add_to_album_from_query() | Provide a search query and add all photos that are returned into an album. Provide the albumname, not the UID of the album. | query: string, albumname: string, count: int (default=1000000) | True if successfull |
 | Photo.check_if_album_exists() | Small function to check if an album exists | name: string, create_if_not: bool (default is False) | True if it exists, False if not (will continue to be False if the album is created) |
-| Photo.create_album() | Create an album, returns a boolean if it worked | title: string | True if successfull |
+| Photo.create_album() | Create an album, returns a boolean if it worked | title: string | Dict object with the album information |
 | Photo.get_album() | Get all information of an album based upon the UID of the album | uid: string | Dict object with the information of the album, False if it does not exist |
 | Photo.get_album_uid_by_name() | Get the UID of an album using the name of the album. Be aware, it uses the list_albums function that is limited to 100000 albums | name: string | String of uid, None if it does not exist |
 | Photo.get_uid_list_of_search() | Return a list of UIDs based upon the search | query: string, count: int (default is 100) | list of uids |
