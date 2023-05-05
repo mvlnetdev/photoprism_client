@@ -40,7 +40,7 @@ This is a list of all other functions within the client. If you want other funct
 | Photo.get_uid_list_of_search() | Return a list of UIDs based upon the search | query: string, count: int (default is 100) | list of uids |
 | Photo.list_albums() | Provide a list of all albums within the photoprism instance, with a max of 100000 | None | Dict object with all albums and their metadata (max of 100000 results) |
 | Photo.raw_call() | Function to perform a request to the photoprism server (usually not needed by a user) | endpoint: string, type: string (default="GET"), data: string (default=False) | requests object |
-| Photo.search() | Create the session | query: string, count: int (default=100), offset: int (default=0) | Dict object of the results of the search |
+| Photo.search() | Create the session | query: string, count: int (default=100), offset: int (default=0), order: string (default="newest") | Dict object of the results of the search |
 | Photo.start_import() | Start an import job, default path is upload. It returns True when the import started, not when finished | path: string (default="upload"), move: Bool (default=False) | True if successfully started |
 | Photo.stop_import() | Stop an import job | None | True if successfully stopped |
 | Photo.remove_photos_from_album() | Remove photos from an album, Returns True if successfull | albumname: string, photos: bool (default=False), count: int (default=1000000) | True if succesfull |
