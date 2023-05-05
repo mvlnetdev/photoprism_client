@@ -22,7 +22,16 @@ print(f"The name of the first album is: {p.get_album(album_uid)['Title']}")
 
 # Create an album
 temp_name=str(uuid.uuid4())
-p.create_album(temp_name)
+new_album = p.create_album(temp_name)
+print(new_album)
+
+# Add the first photo to the album
+foto_uid = p.search(query="original:*", count=1)
+print(p.add_photos_to_album([foto_uid[0]["UID"]],new_album["UID"]))
+
+print(p.remove_photos_from_album(albumname=new_album["Title"]))
+
+print(p.add_to_album_from_query(query="original:*", albumname=new_album["Title"], count=1))
 
 # Delete an album
-p.remove_album(temp_name)
+print(p.remove_album(temp_name))

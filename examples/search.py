@@ -5,4 +5,6 @@ pp_session = Session("admin", "changethis", "demo.photoprism.app")
 pp_session.create()
 
 p = Photo(pp_session)
-p.search(query="original:*")
+data = p.search(query="original:*")
+if type(data) == list:
+    print(f"Returned: {len(data)} results")
