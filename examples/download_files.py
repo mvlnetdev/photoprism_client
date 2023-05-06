@@ -7,4 +7,4 @@ pp_session.create()
 p = Photo(pp_session)
 data = p.search(query="original:*", count=1)
 
-p.download_photo(data[0]["Hash"])
+p.download_file(data[0]["Hash"])

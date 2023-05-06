@@ -138,7 +138,7 @@ class Photo():
         
         return False
 
-    def download_photo(self, hash):
+    def download_file(self, hash):
         status_code, data = self.session.req(f"/dl/{hash}", "GET")
 
         if status_code == 200:
