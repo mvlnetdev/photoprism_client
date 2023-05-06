@@ -1,4 +1,5 @@
 """Interaction with the API of PhotoPrism"""
+import uuid
 
 from photoprism import Session
 import requests, json
@@ -16,10 +17,10 @@ class Photo():
         _, data = self.session.req(f"/photos?count={count}&q={query}&offset={offset}&order={order}", "GET")
         return data
 
-    def get_uid_list_of_search(self, query, count=100):
+    def get_uid_list_of_search(self, query, count=100, offset=0, order="newest"):
         """Return a list of UIDs based upon the search"""
 
-        photos = self.search(query, count)
+        photos = self.search(query, count, offset=offset, order=order)
         photolist = []
         for ps in photos:
             photolist.append(ps["UID"])
@@ -76,12 +77,12 @@ class Photo():
 
         return False
 
-    def add_to_album_from_query(self, query, albumname, count=1000000):
+    def add_to_album_from_query(self, query, albumname, count=1000000, offset=0, order="newest"):
         """Provide a search query and add all photos that are returned into an album. Provide the albumname, not the UID of the album."""
 
         self.check_if_album_exists(albumname, create_if_not=True)
         album_uid = self.get_album_uid_by_name(albumname)
-        photolist = self.get_uid_list_of_search(query, count=count)
+        photolist = self.get_uid_list_of_search(query, count=count, offset=offset, order=order)
         result = self.add_photos_to_album(photolist, album_uid)
         return result
 
@@ -112,7 +113,11 @@ class Photo():
     def remove_album(self, albumname):
         """Remove album based on album name"""
         album_uid = self.get_album_uid_by_name(albumname)
-        status_code, data = self.session.req(f"/albums/{album_uid}", "DELETE")
+        return self.remove_album_uid(album_uid)
+
+    def remove_album_uid(self, uid):
+        """Remove album based on album uid"""
+        status_code, data = self.session.req(f"/albums/{uid}", "DELETE")
         if status_code == 200:
             return data
 
@@ -137,3 +142,35 @@ class Photo():
             return True
         
         return False
+
+    def download_file(self, hash, path=".", filename=None):
+        """Download a single file"""
+        status_code, data = self.session.req(f"/dl/{hash}", "GET", path=path, filename=filename)
+
+        if status_code == 200:
+            return True
+        return False
+
+    def download_album(self, uid, path=".", filename=None):
+        """Download an entire album as ZIP"""
+        status_code, data = self.session.req(f"/albums/{uid}/dl", "GET", stream=True, path=path, filename=filename)
+
+        if status_code == 200:
+            return True
+        return False
+
+    def download_files_from_query(self, query, count=100, offset=0, order="newest"):
+        """Download files from a query"""
+        # In order to make it easy, files are first put into a temporary album
+        # After which they are downloaded
+        # After the download is complete, the folder is removed.
+
+        temp_album = self.create_album(str(uuid.uuid4()))
+        status = self.add_to_album_from_query(query, temp_album["Title"], count=count, offset=offset, order=order)
+        status = self.download_album(temp_album["UID"])
+        status = self.remove_album_uid(temp_album["UID"])
+        return status
+
+
+
+

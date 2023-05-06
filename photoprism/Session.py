@@ -3,6 +3,7 @@
 import json
 from requests import Session as r_session, Request as r_request
 
+from photoprism import mimetypes
 
 class Session():
     def __init__(self, username, password, host, use_https=False, verify_cert=True, user_agent=None):
@@ -32,7 +33,7 @@ class Session():
             "User-Agent": self.user_agent
         }
 
-    def req(self, endpoint, method, **kwargs):
+    def req(self, endpoint, method, stream=False, **kwargs):
         s = r_session()
         r = r_request(method=method, url=f"{self.url}{endpoint}")
 
@@ -45,15 +46,36 @@ class Session():
                 r.data = json.dumps(v)
 
         p = r.prepare()
-        resp = s.send(p)
+        resp = s.send(p, stream=stream)
 
-        data = resp.text
         headers = resp.headers
+        content_type = headers["Content-Type"].split("; ")
+        mime_type, mime_subtype = content_type[0].split("/")
 
-        if headers["Content-Type"].split("; ")[0] == "application/json":
-            data_out = json.loads(data)
+        # Process the return data
+        if mime_type == "application":
+            if mime_subtype == "json":
+                data_out = json.loads(resp.text)
+            elif mime_subtype == "zip":
+                filename = self.determine_filename(kwargs, mime_type, mime_subtype, headers)
+                with open(filename, 'wb') as f:
+                    for chunk in resp.iter_content(chunk_size=10240):
+                        f.write(chunk)
+                data_out = True
+            else:
+                data_out = resp.text
+
+        # Process downloaded single files
+        elif mime_type in ["image", "video"]:
+            filename = self.determine_filename(kwargs, mime_type, mime_subtype, headers)
+
+            with open(filename, "wb") as f:
+                resp.raw.decode_content = True
+                f.write(resp.content)
+            data_out = True
+
         else:
-            data_out = data
+            data_out = resp.text
 
         return resp.status_code, data_out
 
@@ -63,3 +85,20 @@ class Session():
         self.session_id = data["id"]
         self.headers["X-Session-ID"] = self.session_id
         return True
+
+    def determine_filename(self, args, mime_type, mime_subtype, headers):
+        if args["filename"] != None:
+            extension = mimetypes.type[mime_type][mime_subtype]
+            filename = f"{args['filename']}{extension}"
+        else:
+            header_filename = headers["Content-Disposition"].split("; ")[1].split("=")[1]
+            # Sometimes the filename in the header is enclosed, sometimes it isn't. This is to account for that.
+            if header_filename[0] == '"' and header_filename[-1:] == '"':
+                filename = header_filename[1:-1]
+            else:
+                filename=header_filename
+
+        if "path" in args:
+            filename = f"{args['path']}/{filename}"
+
+        return filename
