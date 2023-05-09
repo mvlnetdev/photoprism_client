@@ -1,6 +1,8 @@
 # Python client for PhotoPrism 
 A Python client to interact with photoprism.
 
+Changelog can be found in [here](./changelog.md).
+
 ## IMPORTANT
 This Python client is build on the undocumented API of PhotoPrism. There may be bugs in there. Please let me know if you find some. 
 
