@@ -24,7 +24,6 @@ class Session():
             self.ssl_verify = verify_cert
         self.url = f"{self.protocol}://{self.host}/api/v1"
 
-
         self.user_agent = "Photoprism Python Client"
         if user_agent:
             self.user_agent = user_agent
@@ -35,7 +34,12 @@ class Session():
 
     def req(self, endpoint, method, stream=False, **kwargs):
         s = r_session()
-        r = r_request(method=method, url=f"{self.url}{endpoint}")
+
+        url = f"{self.url}{endpoint}"
+        if endpoint[:3] == "/dl":
+            url = f"{self.url}{endpoint}?t={self.download_token}"
+
+        r = r_request(method=method, url=url)
 
         if self.ssl_enable:
             s.verify = self.ssl_verify
@@ -84,6 +88,8 @@ class Session():
         _, data = self.req("/session", "POST", data=self.login_data)
         self.session_id = data["id"]
         self.headers["X-Session-ID"] = self.session_id
+        self.download_token = data['config']['downloadToken']
+
         return True
 
     def determine_filename(self, args, mime_type, mime_subtype, headers):
