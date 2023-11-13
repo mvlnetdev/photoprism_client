@@ -143,6 +143,27 @@ class Photo():
         
         return False
 
+    def start_index(self, path="/", rescan=False, cleanup=False ):
+        """Start an import job, default path is /. It returns True when the import started, not when finished"""
+        data = {
+            "path": path,
+            "rescan": rescan,
+            "cleanup": cleanup
+        }
+        status_code, _ = self.session.req(f"/index", "POST", data=data)
+        if status_code == 200:
+            return True
+        
+        return False
+
+    def stop_index(self):
+        """Stop an index job"""
+        status_code, _ = self.session.req("/index", "DELETE")
+        if status_code == 200:
+            return True
+        
+        return False
+
     def download_file(self, hash, path=".", filename=None):
         """Download a single file"""
         status_code, data = self.session.req(f"/dl/{hash}", "GET", path=path, filename=filename)

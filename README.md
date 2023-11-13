@@ -71,6 +71,8 @@ This is a list of all other functions within the client. If you want other funct
 | Photo.search() | Create the session | query: string, count: int (default=100), offset: int (default=0), order: string (default="newest") | Dict object of the results of the search |
 | Photo.start_import() | Start an import job, default path is upload. It returns True when the import started, not when finished | path: string (default="upload"), move: Bool (default=False) | True if successfully started |
 | Photo.stop_import() | Stop an import job | None | True if successfully stopped |
+| Photo.start_index() | Start an index job, default path is /. It returns True when the import started, not when finished | path: string (default="/"), rescan: Bool (default=False), cleanup: Bool (default=False) | True if successfully started |
+| Photo.stop_index() | Stop an index job | None | True if successfully stopped |
 | Photo.remove_photos_from_album() | Remove photos from an album, Returns True if successfull | albumname: string, photos: bool (default=False), count: int (default=1000000) | True if succesfull |
 | Photo.remove_album() | Remove album based on album name | albumname: string | Dict data returned from the server |
 | Photo.remove_album_uid() | Remove album based on album uid | uid: string | Dict of the removed album, False if action failed. |
