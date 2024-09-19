@@ -36,7 +36,7 @@ class Session():
         s = r_session()
 
         url = f"{self.url}{endpoint}"
-        if endpoint[:3] == "/dl":
+        if endpoint[-3:] == "/dl":
             url = f"{self.url}{endpoint}?t={self.download_token}"
 
         r = r_request(method=method, url=url)
